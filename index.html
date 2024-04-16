@@ -45,6 +45,10 @@
     bottom: 0;
   }
 }
+.twitch .twitch-chat.hidden {
+  display: none;
+}
+
 </style>
 <body>
   <header>
@@ -71,6 +75,16 @@
         width="100%">
       </iframe>
     </div>
+    <button id="toggle-chat">Toggle Chat</button>
+
   </div>
+  <script>
+    const chatDiv = document.querySelector('.twitch-chat');
+    const toggleButton = document.getElementById('toggle-chat');
+  
+    toggleButton.addEventListener('click', function() {
+      chatDiv.classList.toggle('hidden');  // Toggles 'hidden' class
+    });
+  </script>
 </body>
 </html>
