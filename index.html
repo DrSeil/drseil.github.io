@@ -81,7 +81,21 @@
   <script>
     const chatDiv = document.querySelector('.twitch-chat');
     const toggleButton = document.getElementById('toggle-chat');
-  
+    const videoFrame = document.getElementById('twitch-video');
+
+    // Get the URL parameters
+    const urlParams = new URLSearchParams(window.location.search);
+
+    // Check if there's a "stream" parameter
+    const stream = urlParams.get('stream');
+
+    let streamUrl = "https://player.twitch.tv/?channel=grandpoobear&parent=drseil.github.io&autoplay=false";
+    if (stream) {
+    streamUrl = `https://player.twitch.tv/?channel=${stream}&parent=drseil.github.io&autoplay=false`;
+    }
+
+    videoFrame.src = streamUrl;
+
     toggleButton.addEventListener('click', function() {
       chatDiv.classList.toggle('hidden');  // Toggles 'hidden' class
     });
