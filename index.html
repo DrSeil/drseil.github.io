@@ -59,7 +59,7 @@
     <div class="twitch-video">
       <iframe
       id="twitch-video"
-        src="https://player.twitch.tv/?channel=grandpoobear&parent=drseil.github.io&autoplay=false"
+        src="https://player.twitch.tv/?channel=grandpoobear&parent=localhost&autoplay=false"
         frameborder="0"
         scrolling="no"
         allowfullscreen="true"
@@ -71,7 +71,7 @@
       <iframe
         frameborder="0"
         scrolling="no"
-        src="https://www.twitch.tv/embed/grandpoobear/chat?parent=drseil.github.io"
+        src="https://www.twitch.tv/embed/grandpoobear/chat?parent=localhost"
         height="100%"
         width="100%">
       </iframe>
@@ -79,7 +79,30 @@
     <button id="toggle-chat">Toggle Chat</button>
 
   </div>
+  <button id="twitch-link-button">Link to Twitch</button>
+  <script type="text/javascript" src="eventsub.js"></script>
+
   <script>
+    const type_map = {
+  "Normal": "N",
+  "Fire": "F",
+  "Water": "W",
+  "Electric": "E",
+  "Grass": "G",
+  "Ice": "I",
+  "Fighting": "Fi",  // "F" conflicts with Fire
+  "Poison": "P",
+  "Ground": "Gr",  // "G" conflicts with Grass
+  "Flying": "Fl",  // "F" conflicts with Fire
+  "Psychic": "Ps",  // "P" conflicts with Poison
+  "Bug": "B",
+  "Rock": "R",
+  "Ghost": "Gh",  // "G" conflicts with Grass
+  "Dragon": "D",  // "D" is unique
+  "Dark": "Da",  // "D" conflicts with Dragon
+  "Steel": "S",
+  "Fairy": "Fa"   // "F" conflicts with Fire, "Fi" conflicts with Fighting
+}
     const chatDiv = document.querySelector('.twitch-chat');
     const toggleButton = document.getElementById('toggle-chat');
     const videoFrame = document.getElementById('twitch-video');
@@ -90,9 +113,9 @@
     // Check if there's a "stream" parameter
     const stream = urlParams.get('stream');
 
-    let streamUrl = "https://player.twitch.tv/?channel=grandpoobear&parent=drseil.github.io&autoplay=false";
+    let streamUrl = "https://player.twitch.tv/?channel=grandpoobear&parent=localhost&autoplay=false";
     if (stream) {
-    streamUrl = `https://player.twitch.tv/?channel=${stream}&parent=drseil.github.io&autoplay=false`;
+    streamUrl = `https://player.twitch.tv/?channel=${stream}&parent=localhost&autoplay=false`;
     }
 
     videoFrame.src = streamUrl;
@@ -100,6 +123,242 @@
     toggleButton.addEventListener('click', function() {
       chatDiv.classList.toggle('hidden');  // Toggles 'hidden' class
     });
+    const twitch_link_button = document.getElementById('twitch-link-button');
+
+    function generateRandomString(length) {
+    let text = "";
+    const possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+    for (let i = 0; i < length; i++) {
+        text += possible.charAt(Math.floor(Math.random() * possible.length));
+    }
+    return text;
+    }
+
+    function encodeScope() {
+    const scope = "user:read:chat user:write:chat";
+    return encodeURIComponent(scope);
+    }
+
+    twitch_link_button.addEventListener('click', function() {
+    const state = generateRandomString(16); // Change 16 to your desired string length
+    const encodedScope = encodeScope();
+    localStorage.setItem('state',state);
+    const url = `https://id.twitch.tv/oauth2/authorize?response_type=token&client_id=nst9a3hi1iioqv1p75ph1cbx9oridg&redirect_uri=http://localhost:8081&scope=${encodedScope}&state=${state}`;
+    window.location.href = url;
+    });
+
+    // Set button style (optional)
+    twitch_link_button.style.backgroundColor = "purple";
+    twitch_link_button.style.color = "white";
+
+    window.addEventListener('load', function() {
+        const fragmentString = window.location.hash;
+
+    // Remove the leading hash symbol (#)
+        const fragmentParams = new URLSearchParams(fragmentString.substring(1));
+
+        const accessToken = fragmentParams.get('access_token');
+        const scope = fragmentParams.get('scope');
+        const state = fragmentParams.get('state');
+        const tokenType = fragmentParams.get('token_type');
+
+        console.log('access_token:', accessToken);
+        console.log('scope:', scope);
+        console.log('state:', state);
+        console.log('token_type:', tokenType);
+
+    const storedState = localStorage.getItem('state');
+    console.log(storedState)
+    if (accessToken && state && state === storedState) {
+        localStorage.setItem('access_token', accessToken);
+        localStorage.removeItem('state'); // Remove state after successful use
+        console.log('stored access token' + accessToken)
+        processToken(accessToken);
+
+    }
+    });
+
+    var client_id = 'nst9a3hi1iioqv1p75ph1cbx9oridg';
+    var redirect = window.location.origin + '/twitch_misc/';
+    var access_token = '';
+    var socket_space = '';
+    var session_id = '';
+    var my_user_id = '';
+    const broadcasterId = "809750335";
+    function addsimplelog(message) {
+            console.log(message)
+        }
+        function log(message) {
+            
+            console.log( message);
+        }
+
+
+    if (document.location.hash && document.location.hash != '') {
+        log('Checking for token');
+        var parsedHash = new URLSearchParams(window.location.hash.slice(1));
+        if (parsedHash.get('access_token')) {
+            log('Got a token');
+            processToken(parsedHash.get('access_token'));
+        }
+    }
+
+    function processToken(token) {
+        log('Got a token trying to get chats')
+            access_token = token;
+
+            twitch_link_button.style.display = 'none';//remove link to avoid relinks....
+
+            fetch(
+                'https://api.twitch.tv/helix/users',
+                {
+                    "headers": {
+                        "Client-ID": client_id,
+                        "Authorization": `Bearer ${access_token}`
+                    }
+                }
+            )
+                .then(resp => resp.json())
+                .then(resp => {
+                    console.log(resp)
+                    socket_space = new initSocket(true);
+                    // and build schnanaigans
+                    socket_space.on('connected', (id) => {
+                        log(`Connected to WebSocket with ${id}`);
+                        session_id = id;
+                        my_user_id = resp.data[0].id;
+
+                        requestHooks(broadcasterId, my_user_id);
+                        sendMessage("This is a test")
+
+                        // extra/needed data
+                    });
+
+                    socket_space.on('session_silenced', () => {
+                        addsimplelog('Session mystery died due to silence detected');
+                    });
+                    socket_space.on('session_keepalive', () => {
+                        console.log("keepalive")
+                    });
+                    socket_space.on('revocation', ({ payload }) => {
+                        let { event, subscription } = payload;
+                        //let { subscription_type, subscription_version } = event;
+                        let { status, condition, type } = subscription;
+                        let { broadcaster_user_id } = condition;
+
+                        addsimplelog(`On ${broadcaster_user_id} you were ${status} and ${type} was revoked`);
+                    });
+
+  
+
+                    socket_space.on('channel.chat.message', ({ payload }) => {
+                        let { event } = payload;
+
+                        let { badges, color } = event;
+                        let { broadcaster_user_id, broadcaster_user_login, broadcaster_user_name } = event;
+                        let { chatter_user_id, chatter_user_login, chatter_user_name } = event;
+                        let { cheer, channel_points_custom_reward_id, message_type } = event;
+                        let { message_id, message, reply } = event;
+
+                        let { text, fragments } = message;
+
+                        console.log(message)
+                        console.log(event)
+                    });
+
+
+                })
+                .catch(err => {
+                    console.log(err);
+                    log('Error with Users Call');
+                });
+        }
+
+
+
+        function requestHooks(broadcaster_user_id, user_id) {
+            let topics = {
+
+                'channel.chat.message': { version: "1", condition: { broadcaster_user_id, user_id } },
+
+            }
+
+            log(`Spawn Topics for ${user_id}`);
+
+            for (let type in topics) {
+                log(`Attempt create ${type} - ${broadcaster_user_id} via ${user_id}`);
+                let { version, condition } = topics[type];
+
+                fetch(
+                    'https://api.twitch.tv/helix/eventsub/subscriptions',
+                    {
+                        "method": "POST",
+                        "headers": {
+                            "Client-ID": client_id,
+                            "Authorization": `Bearer ${access_token}`,
+                            'Content-Type': 'application/json'
+                        },
+                        "body": JSON.stringify({
+                            type,
+                            version,
+                            condition,
+                            transport: {
+                                method: "websocket",
+                                session_id
+                            }
+                        })
+                    }
+                )
+                    .then(resp => resp.json())
+                    .then(resp => {
+                        if (resp.error) {
+                            log(`Error with eventsub Call ${type} Call: ${resp.message ? resp.message : ''}`);
+                        } else {
+                            log(`Created ${type}`);
+                        }
+                    })
+                    .catch(err => {
+                        console.log(err);
+                        log(`Error with eventsub Call ${type} Call: ${err.message ? err.message : ''}`);
+                    });
+            }
+        }
+
+const message = "Hello, world! twitchdevHype";
+
+
+function sendMessage(message){
+    const url = 'https://api.twitch.tv/helix/chat/messages';
+    const accessToken =  localStorage.getItem('access_token');
+
+
+const data = {
+  broadcaster_id: broadcasterId,
+  sender_id: my_user_id,
+  message: message
+};
+console.log(data)
+fetch(url, {
+  method: 'POST',
+  headers: {
+    'Authorization': `Bearer ${accessToken}`,
+    'Client-Id': client_id,
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify(data)
+})
+.then(response => response.json())
+.then(data => {
+  console.log('Response:', data);
+})
+.catch(error => {
+  console.error('Error:', error);
+});
+
+}
+
+        
   </script>
 </body>
 </html>
