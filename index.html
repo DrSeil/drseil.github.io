@@ -80,29 +80,298 @@
 
   </div>
   <button id="twitch-link-button">Link to Twitch</button>
+  <div id="moveable">
+    <div id="pokeball-container">
+      <img id="pokeball-image" src=".\static-pokeball.png" style="display: block;">
+      <img id="pokeball-gif" src=".\pokeball.gif" style="display: none;"><div id="ready-text"></div>
+      <p id="pokeball-text">
+        If the pokeball is moving, you are eligible to be the trainer in GPB vs Chat Ironmon. If the pokeball isn't moving, either chat or gift/renew your subscription to GPB to become eligible. Click and drag the pokeball to move the extension.  Click this message to hide the text.
+      </p>
+    </div>
+    <div id="countdown-div" style="display: none;">
+      <p id="countdown-text">You are one of the next X trainers, please ready up within the next YY seconds</p>
+      <button id="ready-up">Ready Up</button>
+      <button id="skip-me">Skip Me</button>
+    </div>
+    <div class="primary">
+      <div class="title">
+        <div class="pokemon">
+          <h1 id="name" class="name"></h1>
+          <div id="types">
+            <div id="type0" class='type-icon'></div> 
+            <div id="type1" class='type-icon'></div> 
+          </div>
+        </div>
+        <div class="health">
+          HP: <span class="current-health"></span> / <span class="max-health"></span>
+        </div>
+      </div>
+      <div class="ability">
+        <span id="ability"> </span>
+      </div>
+      <div id="stats" class="row">
+        <div class= "column">
+          <div class="column-stat">
+            HP
+          </div>
+          <div class="column-value">
+            <span class="max-health"></span>
+          </div>
+          <div class="column-stat">
+            ATK
+          </div>
+          <div class="column-value">
+            <span class="attack"></span>
+          </div>
+          <div class="column-stat">
+            DEF
+          </div>
+          <div class="column-value">
+            <span class="defense"></span>
+          </div>
+        </div>
+        <div class="column">
+          <div class="column-stat">
+            SPA
+          </div>
+          <div class="column-value">
+            <span class="special-attack"></span>
+          </div>
+          <div class="column-stat">
+            SPD
+          </div>
+          <div class="column-value">
+            <span class="special-defense"></span>
+          </div>
+          <div class="column-stat">
+            SPE
+          </div>
+          <div class="column-value">
+            <span class="speed"></span>
+          </div>
+        </div>
+      </div>
+      <div id="moves">
+        <div class="grid-container">
+          <button class="button" id="move0">
+            <div class="move" >
+              <div id="move0-category" class="move-category"></div>
+              <div class="move-details">
+                <div class="move-name">
+                  <span id="move0-name"></span>
+                </div>
+                <div class="move-type">
+                  <p id="move0-type" class='type-icon'></p>
+                </div>
+                <div class="move-details">
+                  POW: <span id="move0-power" class="power"></span>
+                  PP: <span id="move0-pp" class="pp"></span>
+                </div>  
+              </div>
+            </div>
+          </button>
+          <button class="button" id="move1">
+            <div class="move" >
+              <div id="move1-category" class="move-category"></div>
+              <div class="move-details">
+                <div class="move-name">
+                  <span id="move1-name"></span>
+                </div>
+                <div class="move-type">
+                  <p id="move1-type" class='type-icon'></p>
+                </div>
+                <div class="move-details">
+                  POW: <span id="move1-power" class="power"></span>
+                  PP: <span id="move1-pp" class="pp"></span>
+                </div>  
+              </div>
+            </div>
+          </button>
+          <button class="button" id="move2">
+            <div class="move" >
+              <div id="move2-category" class="move-category"></div>
+              <div class="move-details">
+                <div class="move-name">
+                  <span id="move2-name"></span>
+                </div>
+                <div class="move-type">
+                  <p id="move2-type" class='type-icon'></p>
+                </div>
+                <div class="move-details">
+                  POW: <span id="move2-power" class="power"></span>
+                  PP: <span id="move2-pp" class="pp"></span>
+                </div>  
+              </div>
+            </div>
+          </button>
+          <button class="button" id="move3" >
+            <div class="move" >
+              <div id="move3-category" class="move-category"></div>
+              <div class="move-details">
+                <div class="move-name">
+                  <span id="move3-name"></span>
+                </div>
+                <div class="move-type">
+                  <p id="move3-type" class='type-icon'></p>
+                </div>
+                <div class="move-details">
+                  POW: <span id="move3-power" class="power"></span>
+                  PP: <span id="move3-pp" class="pp"></span>
+                </div>  
+              </div>
+            </div>
+          </button>
+        </div>
+      </div>
+    </div>
+    
+  
+  <div id="waiting" class="waiting">
+    <img src=".\loading-loading-forever.gif" />
+    <h3>Waiting for input from game</h3>
+  </div>
+</div>
+
+  <script type="text/javascript" src="./script.ts"></script>
   <script type="text/javascript" src="eventsub.js"></script>
 
   <script>
+/*const category_map = {"Special" : "s","Physical":"p","Status":"t"};
     const type_map = {
-  "Normal": "N",
-  "Fire": "F",
-  "Water": "W",
-  "Electric": "E",
-  "Grass": "G",
-  "Ice": "I",
-  "Fighting": "Fi",  // "F" conflicts with Fire
-  "Poison": "P",
-  "Ground": "Gr",  // "G" conflicts with Grass
-  "Flying": "Fl",  // "F" conflicts with Fire
-  "Psychic": "Ps",  // "P" conflicts with Poison
-  "Bug": "B",
-  "Rock": "R",
-  "Ghost": "Gh",  // "G" conflicts with Grass
-  "Dragon": "D",  // "D" is unique
-  "Dark": "Da",  // "D" conflicts with Dragon
-  "Steel": "S",
-  "Fairy": "Fa"   // "F" conflicts with Fire, "Fi" conflicts with Fighting
+  "normal": "N",
+  "fire": "F",
+  "water": "W",
+  "electric": "E",
+  "grass": "G",
+  "ice": "I",
+  "fighting": "Fi",  // "F" conflicts with Fire
+  "poison": "P",
+  "ground": "Gr",  // "G" conflicts with Grass
+  "flying": "Fl",  // "F" conflicts with Fire
+  "psychic": "Ps",  // "P" conflicts with Poison
+  "bug": "B",
+  "rock": "R",
+  "ghost": "Gh",  // "G" conflicts with Grass
+  "dragon": "D",  // "D" is unique
+  "dark": "Da",  // "D" conflicts with Dragon
+  "steel": "S",
+  "fairy": "Fa"   // "F" conflicts with Fire, "Fi" conflicts with Fighting
 }
+
+function encodePokemon(pokemon) {
+  const stats = Object.values(pokemon.stats).join("-");
+  const moves = pokemon.moves.map(move => [category_map[move.category], move.name,move.power,type_map[move.type],move.accuracy,move.pp].join(":"));
+  return [
+    pokemon.uid,
+    pokemon.nature,
+    pokemon.curHP,
+    pokemon.name,
+    stats,
+    pokemon.types.map(type=>{return type_map[type]}).join("|"),
+    moves.join("|"),
+    pokemon.ability
+  ].join(",");
+}
+
+const condensedData = encodePokemon({
+  "uid": "U135753687",
+  "nature": "Hasty",
+  "curHP": 33,
+  "name": "Dragonair",
+  "stats": {
+    "atk": 20,
+    "hp": 33,
+    "def": 17,
+    "spa": 15,
+    "spe": 20,
+    "spd": 11
+  },
+  "types": [
+    "dragon",
+    "fire"
+  ],
+  "moves": [
+    {
+      "category": "Special",
+      "name": "Psych Up",
+      "power": "90",
+      "type": "normal",
+      "accuracy": "0",
+      "pp": 10
+    },
+    {
+      "category": "Status",
+      "name": "Fake Tears",
+      "power": "0",
+      "type": "dark",
+      "accuracy": "100",
+      "pp": 20
+    },
+    {
+      "category": "Physical",
+      "name": "Jump Kick",
+      "power": "70",
+      "type": "fighting",
+      "accuracy": "95",
+      "pp": 3
+    },
+    {
+      "category": "Status",
+      "name": "Conversion 2",
+      "power": "0",  
+      "type": "normal",
+      "accuracy": "0",
+      "pp": 0
+    }
+  ],
+  "ability": "Swift Swim"
+});
+
+console.log(condensedData) // U135753687,Hasty,33,Dragonair,20-33-17-15-20-11,dragon|fire,s:Psych Up:90:N:0:10|t:Fake Tears:0:Da:100:20|p:Jump Kick:70:Fi:95:3|t:Conversion 2:0:N:0:0,Swift Swim
+
+const category_reverse = {"s" : "Special","p":"Physical","t":"Status"};
+const type_reverse = {  // Inverted mapping for decoding type codes
+  "N": "normal",
+  "F": "fire",
+  "W": "water",
+  "E": "electric",
+  "G": "grass",
+  "I": "ice",
+  "Fi": "fighting",
+  "P": "poison",
+  "Gr": "ground",
+  "Fl": "flying",
+  "Ps": "psychic",
+  "B": "bug",
+  "R": "rock",
+  "Gh": "ghost",
+  "D": "dragon",
+  "Da": "dark",
+  "S": "steel",
+  "Fa": "fairy"
+}
+
+function decodePokemon(data) {
+  const [uid, nature, curHP, name, stats, types, moves, ability] = data.split(",");
+  return {
+    uid,
+    nature,
+    curHP: parseInt(curHP),
+    name,
+    stats: Object.fromEntries(stats.split("-").map((stat, index) => [["atk", "hp", "def", "spa", "spe", "spd"][index], stat])),
+    types: types.split("|").map(type => {return type_reverse[type]}),
+    moves: moves.split("|").map(move => {
+      const [category, name, power, type, accuracy, pp] = move.split(":");
+      return { category: category_reverse[category], name, power: power === "0" ? power : parseInt(power), type: type_reverse[type], accuracy: accuracy === "0" ? parseInt(accuracy) : parseFloat(accuracy), pp: parseInt(pp) };
+    }),
+    ability
+  };
+}
+
+// Decode the previously encoded data (condensedData) as an example
+const decodedPokemon = decodePokemon(condensedData);
+
+console.log(decodedPokemon)*/
     const chatDiv = document.querySelector('.twitch-chat');
     const toggleButton = document.getElementById('toggle-chat');
     const videoFrame = document.getElementById('twitch-video');
@@ -185,7 +454,11 @@
     var socket_space = '';
     var session_id = '';
     var my_user_id = '';
-    const broadcasterId = "809750335";
+
+    //ironmob_fanin  1068813693
+    //ironmob_fanout  1068814053
+    const fanout = "1068814053";
+    const fanin = "1068813693";
     function addsimplelog(message) {
             console.log(message)
         }
@@ -203,6 +476,48 @@
             processToken(parsedHash.get('access_token'));
         }
     }
+
+    const category_reverse = {"s" : "Special","p":"Physical","t":"Status"};
+    const type_reverse = {  // Inverted mapping for decoding type codes
+    "N": "normal",
+    "F": "fire",
+    "W": "water",
+    "E": "electric",
+    "G": "grass",
+    "I": "ice",
+    "Fi": "fighting",
+    "P": "poison",
+    "Gr": "ground",
+    "Fl": "flying",
+    "Ps": "psychic",
+    "B": "bug",
+    "R": "rock",
+    "Gh": "ghost",
+    "D": "dragon",
+    "Da": "dark",
+    "S": "steel",
+    "Fa": "fairy"
+    }
+
+    function decodePokemon(data) {
+    const [uid, nature, curHP, name, stats, types, moves, ability] = data.split(",");
+    return {
+        uid,
+        nature,
+        curHP: parseInt(curHP),
+        name,
+        stats: Object.fromEntries(stats.split("-").map((stat, index) => [["atk", "hp", "def", "spa", "spe", "spd"][index], stat])),
+        types: types.split("|").map(type => {return type_reverse[type]}),
+        moves: moves.split("|").map(move => {
+        const [category, name, power, type, accuracy, pp] = move.split(":");
+        return { category: category_reverse[category], name, power: power === "0" ? power : parseInt(power), type: type_reverse[type], accuracy: accuracy === "0" ? parseInt(accuracy) : parseFloat(accuracy), pp: parseInt(pp) };
+        }),
+        ability
+    };
+    }
+
+// Decode the previously encoded data (condensedData) as an example
+const decodedPokemon = decodePokemon(condensedData);
 
     function processToken(token) {
         log('Got a token trying to get chats')
@@ -229,7 +544,7 @@
                         session_id = id;
                         my_user_id = resp.data[0].id;
 
-                        requestHooks(broadcasterId, my_user_id);
+                        requestHooks(fanout, my_user_id);
                         sendMessage("This is a test")
 
                         // extra/needed data
@@ -255,13 +570,21 @@
                     socket_space.on('channel.chat.message', ({ payload }) => {
                         let { event } = payload;
 
-                        let { badges, color } = event;
                         let { broadcaster_user_id, broadcaster_user_login, broadcaster_user_name } = event;
                         let { chatter_user_id, chatter_user_login, chatter_user_name } = event;
-                        let { cheer, channel_points_custom_reward_id, message_type } = event;
                         let { message_id, message, reply } = event;
 
                         let { text, fragments } = message;
+
+                        if (text.startsWith("pkmn;")) {
+
+
+                        // Split the data into parts using ';' as delimiter
+                        const pokemon = text.slice(5); // Remove "pkmn;" and split by ','
+                        console.log(decodePokemon(pokemon))
+
+                        }
+
 
                         console.log(message)
                         console.log(event)
@@ -333,28 +656,28 @@ function sendMessage(message){
     const accessToken =  localStorage.getItem('access_token');
 
 
-const data = {
-  broadcaster_id: broadcasterId,
-  sender_id: my_user_id,
-  message: message
-};
-console.log(data)
-fetch(url, {
-  method: 'POST',
-  headers: {
-    'Authorization': `Bearer ${accessToken}`,
-    'Client-Id': client_id,
-    'Content-Type': 'application/json'
-  },
-  body: JSON.stringify(data)
-})
-.then(response => response.json())
-.then(data => {
-  console.log('Response:', data);
-})
-.catch(error => {
-  console.error('Error:', error);
-});
+    const data = {
+    broadcaster_id: fanin,
+    sender_id: my_user_id,
+    message: message
+    };
+    console.log(data)
+    fetch(url, {
+    method: 'POST',
+    headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Client-Id': client_id,
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+    console.log('Response:', data);
+    })
+    .catch(error => {
+    console.error('Error:', error);
+    });
 
 }
 
