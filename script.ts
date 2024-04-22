@@ -1,6 +1,5 @@
 
 // Twitch stuff probably won't work localy, just mock atoken and userid
-const twitch = window.Twitch.ext;
 var atoken, userId, currPoke, moveUsed;
 
 
@@ -79,47 +78,12 @@ function countdownFinished() {
 // Event listeners for buttons
 readyUpButton.addEventListener("click", () => {
     countdownFinished();
-    let url = 'https://us-west1-ironmob.cloudfunctions.net/TrainerReady';
-    let data = { 
-            token: twitch.viewer.sessionToken,
-            IsReady: true,
-              
-            };
-//console.log(data);
-
-        fetch(url, {
-            mode: 'no-cors',
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data),
-        })
-    .then(response => console.log(response))
-    //.then(data => console.log(data))
-    .catch((error) => console.error('Error:', error));
+    sendMessage("I'm ready")
 });
 
 skipMeButton.addEventListener("click", () => {
     countdownFinished();
-    let url = 'https://us-west1-ironmob.cloudfunctions.net/TrainerReady';
-    let data = { 
-          token: twitch.viewer.sessionToken,
-          IsReady: false,
-          };
-//console.log(data);
-
-      fetch(url, {
-          mode: 'no-cors',
-          method: 'POST',
-          headers: {
-              'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(data),
-      })
-    .then(response => console.log(response))
-    //.then(data => console.log(data))
-    .catch((error) => console.error('Error:', error));
+    sendMessage("Skip Me")
 });
 
 function checkChatter(chatter_list){
@@ -133,94 +97,8 @@ function checkChatter(chatter_list){
         showPokeballStatic()
     }
 }
-function handleBroadcast(message){
 
 
-    if(message.hasOwnProperty('chatter_list'))
-    {
-        checkChatter(message.chatter_list);
-        readyText.textContent = ""
-    }
-    if(message.hasOwnProperty('next_trainers'))
-    {
-        if (message.next_trainers.includes(userId)){
-            showPokeballGif()
-            readyText.textContent = "You are one of the next " +(message.next_trainers.length + 1) + " trainers"
-        }
-    }
-    if(message.hasOwnProperty('next_trainer'))
-    {
-        if (message.next_trainer === userId && $('.primary').css('display') != 'block'){
-            showPokeballGif()
-            readyText.textContent = "You are the next trainer"
-        }
-    }
-    if(message.hasOwnProperty('clear_pokemon'))
-    {
-        $('.primary').css("display", "none");
-        $('.waiting').hide();
-    }
-    if(message.hasOwnProperty('uid'))
-    {
-        console.log(message['uid'])
-        if(message['uid'] == userId){
-            readyText.textContent = ""
-            updatePokemon(message)
-
-        }
-    }
-}
-function parseJwt (token){
-    var base64Url = token.split('.')[1];
-    var base64 = base64Url.replace('-', '+').replace('_', '/');
-    return JSON.parse(window.atob(base64));
-    };
-
-twitch.onAuthorized((auth) => {
-    // save our credentials
-    if (twitch.viewer.isLinked) {
-        $('pokeball-text').innerHTML = "If the pokeball is moving, you are eligible to be the trainer in GPB vs Chat Ironmon. If the pokeball isn't moving, either chat or gift/renew your subscription to GPB to become eligible. Click and drag the pokeball to move the extension.  Click this message to hide the text."
-        // user is logged in/ID Shared
-        let url = 'https://us-west1-ironmob.cloudfunctions.net/CheckinV2';
-        let data = { 
-                token: auth.token,
-                  
-                };
-    //console.log(data);
-
-            fetch(url, {
-                mode: 'no-cors',
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(data),
-            })
-        .then(response => console.log(response))
-        //.then(data => console.log(data))
-        .catch((error) => console.error('Error:', error));
-    } else {
-        $('pokeball-text').innerHTML = "If you wish to participate in Chat-Vs-Poo Ironmon please grant access to your UserId in the extension. Click this message to hide the text."
-
-        twitch.actions.requestIdShare();
-    }
-    atoken = auth.token; //JWT passed to backend for authentication 
-    userId = 'U' + parseJwt(atoken).user_id; //opaque userID 
-    console.log('whisper-'+userId)
-    console.log('whisper-'+auth.userId)
-    twitch.listen('whisper-'+auth.userId, (target, type, message)=>{
-        console.log("whisper")
-        console.log(message)
-        handleWhisper(JSON.parse(message));
-      })
-});
-
-
-twitch.listen('broadcast', (target, type, message) => {
-    console.log(message)
-    handleBroadcast(JSON.parse(message))
-}
-);
 
 var Dragonair = {
     "uid": "U135753687",
@@ -278,6 +156,7 @@ var Dragonair = {
 
 
 function updatePokemon(pokemon) {
+    console.log(pokemon)
     resetCustomTags();
 
     // In theory the "moveable" tag should be able to be dragged around a webpage, I was hoping users could move the extension to where they want it to be.
@@ -437,6 +316,7 @@ function useMove(event) {
 
 
     //console.log(data);
+    sendMessage("selectedMove:"+moveName)
 
     let url = 'https://us-west1-ironmob.cloudfunctions.net/ChosenMove';
     let data = { selectedMove: moveName, 
@@ -508,3 +388,458 @@ function showPokeballGif() {
 //   // Example function calls to switch images
 //   showPokeballStatic(); // Initially show static image
 //   setTimeout(showPokeballGif, 2000); // After 2 seconds, show animated image
+
+
+const category_map = {"Special" : "s","Physical":"p","Status":"t"};
+    const type_map = {
+  "normal": "N",
+  "fire": "F",
+  "water": "W",
+  "electric": "E",
+  "grass": "G",
+  "ice": "I",
+  "fighting": "Fi",  // "F" conflicts with Fire
+  "poison": "P",
+  "ground": "Gr",  // "G" conflicts with Grass
+  "flying": "Fl",  // "F" conflicts with Fire
+  "psychic": "Ps",  // "P" conflicts with Poison
+  "bug": "B",
+  "rock": "R",
+  "ghost": "Gh",  // "G" conflicts with Grass
+  "dragon": "D",  // "D" is unique
+  "dark": "Da",  // "D" conflicts with Dragon
+  "steel": "S",
+  "fairy": "Fa"   // "F" conflicts with Fire, "Fi" conflicts with Fighting
+}
+
+function encodePokemon(pokemon) {
+  const stats = Object.values(pokemon.stats).join("-");
+  const moves = pokemon.moves.map(move => [category_map[move.category], move.name,move.power,type_map[move.type],move.accuracy,move.pp].join(":"));
+  return [
+    pokemon.uid,
+    pokemon.nature,
+    pokemon.curHP,
+    pokemon.name,
+    stats,
+    pokemon.types.map(type=>{return type_map[type]}).join("|"),
+    moves.join("|"),
+    pokemon.ability
+  ].join(",");
+}
+
+const condensedData = encodePokemon({
+  "uid": "U135753687",
+  "nature": "Hasty",
+  "curHP": 33,
+  "name": "Dragonair",
+  "stats": {
+    "atk": 20,
+    "hp": 33,
+    "def": 17,
+    "spa": 15,
+    "spe": 20,
+    "spd": 11
+  },
+  "types": [
+    "dragon",
+    "fire"
+  ],
+  "moves": [
+    {
+      "category": "Special",
+      "name": "Psych Up",
+      "power": "90",
+      "type": "normal",
+      "accuracy": "0",
+      "pp": 10
+    },
+    {
+      "category": "Status",
+      "name": "Fake Tears",
+      "power": "0",
+      "type": "dark",
+      "accuracy": "100",
+      "pp": 20
+    },
+    {
+      "category": "Physical",
+      "name": "Jump Kick",
+      "power": "70",
+      "type": "fighting",
+      "accuracy": "95",
+      "pp": 3
+    },
+    {
+      "category": "Status",
+      "name": "Conversion 2",
+      "power": "0",  
+      "type": "normal",
+      "accuracy": "0",
+      "pp": 0
+    }
+  ],
+  "ability": "Swift Swim"
+});
+
+console.log(condensedData) // U135753687,Hasty,33,Dragonair,20-33-17-15-20-11,dragon|fire,s:Psych Up:90:N:0:10|t:Fake Tears:0:Da:100:20|p:Jump Kick:70:Fi:95:3|t:Conversion 2:0:N:0:0,Swift Swim
+
+const category_reverse = {"s" : "Special","p":"Physical","t":"Status"};
+const type_reverse = {  // Inverted mapping for decoding type codes
+  "N": "normal",
+  "F": "fire",
+  "W": "water",
+  "E": "electric",
+  "G": "grass",
+  "I": "ice",
+  "Fi": "fighting",
+  "P": "poison",
+  "Gr": "ground",
+  "Fl": "flying",
+  "Ps": "psychic",
+  "B": "bug",
+  "R": "rock",
+  "Gh": "ghost",
+  "D": "dragon",
+  "Da": "dark",
+  "S": "steel",
+  "Fa": "fairy"
+}
+
+function decodePokemon(data) {
+  const [uid, nature, curHP, name, stats, types, moves, ability] = data.split(",");
+  return {
+    uid,
+    nature,
+    curHP: parseInt(curHP),
+    name,
+    stats: Object.fromEntries(stats.split("-").map((stat, index) => [["atk", "hp", "def", "spa", "spe", "spd"][index], stat])),
+    types: types.split("|").map(type => {return type_reverse[type]}),
+    moves: moves.split("|").map(move => {
+      const [category, name, power, type, accuracy, pp] = move.split(":");
+      return { category: category_reverse[category], name, power: power === "0" ? power : parseInt(power), type: type_reverse[type], accuracy: accuracy === "0" ? parseInt(accuracy) : parseFloat(accuracy), pp: parseInt(pp) };
+    }),
+    ability
+  };
+}
+
+// Decode the previously encoded data (condensedData) as an example
+const decodedPokemon = decodePokemon(condensedData);
+
+console.log(decodedPokemon)
+
+
+const chatDiv = document.querySelector('.twitch-chat');
+const toggleButton = document.getElementById('toggle-chat');
+const videoFrame = document.getElementById('twitch-video');
+
+// Get the URL parameters
+const urlParams = new URLSearchParams(window.location.search);
+
+// Check if there's a "stream" parameter
+const stream = urlParams.get('stream');
+
+let streamUrl = "https://player.twitch.tv/?channel=grandpoobear&parent=localhost&autoplay=false";
+if (stream) {
+streamUrl = `https://player.twitch.tv/?channel=${stream}&parent=localhost&autoplay=false`;
+}
+
+videoFrame.src = streamUrl;
+
+toggleButton.addEventListener('click', function() {
+  chatDiv.classList.toggle('hidden');  // Toggles 'hidden' class
+});
+const twitch_link_button = document.getElementById('twitch-link-button');
+
+function generateRandomString(length) {
+let text = "";
+const possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+for (let i = 0; i < length; i++) {
+    text += possible.charAt(Math.floor(Math.random() * possible.length));
+}
+return text;
+}
+
+function encodeScope() {
+const scope = "user:read:chat user:write:chat";
+return encodeURIComponent(scope);
+}
+
+twitch_link_button.addEventListener('click', function() {
+const state = generateRandomString(16); // Change 16 to your desired string length
+const encodedScope = encodeScope();
+localStorage.setItem('state',state);
+const url = `https://id.twitch.tv/oauth2/authorize?response_type=token&client_id=nst9a3hi1iioqv1p75ph1cbx9oridg&redirect_uri=http://localhost:8081&scope=${encodedScope}&state=${state}`;
+window.location.href = url;
+});
+
+// Set button style (optional)
+twitch_link_button.style.backgroundColor = "purple";
+twitch_link_button.style.color = "white";
+
+window.addEventListener('load', function() {
+    const fragmentString = window.location.hash;
+
+// Remove the leading hash symbol (#)
+    const fragmentParams = new URLSearchParams(fragmentString.substring(1));
+
+    const accessToken = fragmentParams.get('access_token');
+    const scope = fragmentParams.get('scope');
+    const state = fragmentParams.get('state');
+    const tokenType = fragmentParams.get('token_type');
+
+    console.log('access_token:', accessToken);
+    console.log('scope:', scope);
+    console.log('state:', state);
+    console.log('token_type:', tokenType);
+
+const storedState = localStorage.getItem('state');
+console.log(storedState)
+if (accessToken && state && state === storedState) {
+    localStorage.setItem('access_token', accessToken);
+    localStorage.removeItem('state'); // Remove state after successful use
+    console.log('stored access token' + accessToken)
+    processToken(accessToken);
+
+}
+});
+
+var client_id = 'nst9a3hi1iioqv1p75ph1cbx9oridg';
+var redirect = window.location.origin + '/twitch_misc/';
+var access_token = '';
+var socket_space = '';
+var session_id = '';
+var my_user_id = '';
+
+//ironmob_fanin  1068813693
+//ironmob_fanout  1068814053
+const fanout = "1068814053";
+const fanin = "1068813693";
+function addsimplelog(message) {
+        console.log(message)
+    }
+function log(message) {
+        
+        console.log( message);
+    }
+
+
+if (document.location.hash && document.location.hash != '') {
+    log('Checking for token');
+    var parsedHash = new URLSearchParams(window.location.hash.slice(1));
+    if (parsedHash.get('access_token')) {
+        log('Got a token');
+        processToken(parsedHash.get('access_token'));
+    }
+}
+
+
+function processToken(token) {
+    log('Got a token trying to get chats')
+        access_token = token;
+
+        twitch_link_button.style.display = 'none';//remove link to avoid relinks....
+
+        fetch(
+            'https://api.twitch.tv/helix/users',
+            {
+                "headers": {
+                    "Client-ID": client_id,
+                    "Authorization": `Bearer ${access_token}`
+                }
+            }
+        )
+            .then(resp => resp.json())
+            .then(resp => {
+                console.log(resp)
+                userId = "U" + resp.data[0].id
+                socket_space = new initSocket(true);
+                // and build schnanaigans
+                socket_space.on('connected', (id) => {
+                    log(`Connected to WebSocket with ${id}`);
+                    session_id = id;
+                    my_user_id = resp.data[0].id;
+
+                    requestHooks(fanout, my_user_id);
+
+                    // extra/needed data
+                });
+
+                socket_space.on('session_silenced', () => {
+                    addsimplelog('Session mystery died due to silence detected');
+                });
+                socket_space.on('session_keepalive', () => {
+                    console.log("keepalive")
+                });
+                socket_space.on('revocation', ({ payload }) => {
+                    let { event, subscription } = payload;
+                    //let { subscription_type, subscription_version } = event;
+                    let { status, condition, type } = subscription;
+                    let { broadcaster_user_id } = condition;
+
+                    addsimplelog(`On ${broadcaster_user_id} you were ${status} and ${type} was revoked`);
+                });
+
+
+
+                socket_space.on('channel.chat.message', ({ payload }) => {
+                    let { event } = payload;
+
+                    let { broadcaster_user_id, broadcaster_user_login, broadcaster_user_name } = event;
+                    let { chatter_user_id, chatter_user_login, chatter_user_name } = event;
+                    let { message_id, message, reply } = event;
+
+                    let { text, fragments } = message;
+
+                    if ( chatter_user_name == "backtothelabbot") {
+                        console.log("backtothelabbot detected")
+                        console.log("text")
+                        if (text.startsWith("pkmn;") ) {
+                            // Split the data into parts using ';' as delimiter
+                            const pokemon = text.slice(5); // Remove "pkmn;" and split by ','
+                            const decoded_pokemon = (decodePokemon(pokemon))
+                            console.log(decoded_pokemon)
+                            if(decoded_pokemon.uid == userId) {
+                                updatePokemon(decoded_pokemon)
+                                ensureDivVisibility(document.getElementById("moveable"))
+
+                            }
+                        } else if (text.startsWith('nts;')) {
+                            const trainer = text.slice(4);
+                            const trainer_list = trainer.split(",")
+                            const trainer_index = trainer_list.indexOf(userId)
+                            console.log(trainer_list)
+                            console.log(userId)
+                            console.log(trainer_index)
+                            if(trainer_index > 0){
+                                readyText.textContent = "You are one of the next " +(trainer_list.length) + " trainers"
+                            }else if (trainer_index == 0 && $('.primary').css('display') != 'block') {
+                                readyText.textContent = "You are the next trainer"
+                            } else if {
+                                readyText.textContent = ""
+                            }
+                        } else if (text.startsWith('clear;')) {
+                            $('.primary').css("display", "none");
+                            $('.waiting').hide();
+                            readyText.textContent = ""
+
+                        }
+                        else if (text.startsWith('ready;'))
+                        {
+                            const text_split = text.slice(6).split(',');
+                            const trainer = text_split[0]
+                            const num_trainers = parseInt(text_split[1])
+                            const msg_countdown = parseInt(text_split[2])
+                            if (trainer == userId)
+                                {
+                                if(countdown > 0){
+                                    console.log("Countdown already triggered")
+                                }else {
+                                    console.log(countdownDiv)
+                                    countdownDiv.style.display = "block";
+                                    trainersCount = num_trainers
+                                    countdown = msg_countdown
+                                    updateCountdown();
+                                }
+                            }
+                         }
+
+                    }
+
+
+                    console.log(message)
+                    console.log(event)
+                });
+
+
+            })
+            .catch(err => {
+                console.log(err);
+                log('Error with Users Call');
+            });
+    }
+
+
+
+    function requestHooks(broadcaster_user_id, user_id) {
+        let topics = {
+
+            'channel.chat.message': { version: "1", condition: { broadcaster_user_id, user_id } },
+
+        }
+
+        log(`Spawn Topics for ${user_id}`);
+
+        for (let type in topics) {
+            log(`Attempt create ${type} - ${broadcaster_user_id} via ${user_id}`);
+            let { version, condition } = topics[type];
+
+            fetch(
+                'https://api.twitch.tv/helix/eventsub/subscriptions',
+                {
+                    "method": "POST",
+                    "headers": {
+                        "Client-ID": client_id,
+                        "Authorization": `Bearer ${access_token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    "body": JSON.stringify({
+                        type,
+                        version,
+                        condition,
+                        transport: {
+                            method: "websocket",
+                            session_id
+                        }
+                    })
+                }
+            )
+                .then(resp => resp.json())
+                .then(resp => {
+                    if (resp.error) {
+                        log(`Error with eventsub Call ${type} Call: ${resp.message ? resp.message : ''}`);
+                    } else {
+                        log(`Created ${type}`);
+                    }
+                })
+                .catch(err => {
+                    console.log(err);
+                    log(`Error with eventsub Call ${type} Call: ${err.message ? err.message : ''}`);
+                });
+        }
+    }
+
+const message = "Hello, world! twitchdevHype";
+
+
+function sendMessage(message){
+    const url = 'https://api.twitch.tv/helix/chat/messages';
+    const accessToken =  localStorage.getItem('access_token');
+
+
+    const data = {
+    broadcaster_id: fanin,
+    sender_id: my_user_id,
+    message: message
+    };
+    console.log(data)
+    fetch(url, {
+    method: 'POST',
+    headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Client-Id': client_id,
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+    console.log('Response:', data);
+    })
+    .catch(error => {
+    console.error('Error:', error);
+    });
+
+}
+
+    
