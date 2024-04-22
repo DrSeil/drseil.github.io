@@ -715,7 +715,7 @@ function processToken(token) {
                                 readyText.textContent = "You are one of the next " +(trainer_list.length) + " trainers"
                             }else if (trainer_index == 0 && $('.primary').css('display') != 'block') {
                                 readyText.textContent = "You are the next trainer"
-                            } else if {
+                            } else {
                                 readyText.textContent = ""
                             }
                         } else if (text.startsWith('clear;')) {

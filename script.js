@@ -468,9 +468,9 @@ var videoFrame = document.getElementById('twitch-video');
 var urlParams = new URLSearchParams(window.location.search);
 // Check if there's a "stream" parameter
 var stream = urlParams.get('stream');
-var streamUrl = "https://player.twitch.tv/?channel=grandpoobear&parent=localhost&autoplay=false";
+var streamUrl = "https://player.twitch.tv/?channel=grandpoobear&parent=ironmob.live&autoplay=false";
 if (stream) {
-    streamUrl = "https://player.twitch.tv/?channel=".concat(stream, "&parent=localhost&autoplay=false");
+    streamUrl = "https://player.twitch.tv/?channel=".concat(stream, "&parent=ironmob.live&autoplay=false");
 }
 videoFrame.src = streamUrl;
 toggleButton.addEventListener('click', function () {
@@ -493,7 +493,7 @@ twitch_link_button.addEventListener('click', function () {
     var state = generateRandomString(16); // Change 16 to your desired string length
     var encodedScope = encodeScope();
     localStorage.setItem('state', state);
-    var url = "https://id.twitch.tv/oauth2/authorize?response_type=token&client_id=nst9a3hi1iioqv1p75ph1cbx9oridg&redirect_uri=http://localhost:8081&scope=".concat(encodedScope, "&state=").concat(state);
+    var url = "https://id.twitch.tv/oauth2/authorize?response_type=token&client_id=nst9a3hi1iioqv1p75ph1cbx9oridg&redirect_uri=https://ironmob.live&scope=".concat(encodedScope, "&state=").concat(state);
     window.location.href = url;
 });
 // Set button style (optional)
@@ -614,11 +614,9 @@ function processToken(token) {
                     else if (trainer_index == 0 && $('.primary').css('display') != 'block') {
                         readyText.textContent = "You are the next trainer";
                     }
-                    else if ({
-                        readyText: readyText,
-                        : .textContent = ""
-                    })
-                        ;
+                    else {
+                        readyText.textContent = "";
+                    }
                 }
                 else if (text.startsWith('clear;')) {
                     $('.primary').css("display", "none");
