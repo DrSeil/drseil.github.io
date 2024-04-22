@@ -538,9 +538,9 @@ const urlParams = new URLSearchParams(window.location.search);
 // Check if there's a "stream" parameter
 const stream = urlParams.get('stream');
 
-let streamUrl = "https://player.twitch.tv/?channel=grandpoobear&parent=localhost&autoplay=false";
+let streamUrl = "https://player.twitch.tv/?channel=grandpoobear&parent=ironmob.live&autoplay=false";
 if (stream) {
-streamUrl = `https://player.twitch.tv/?channel=${stream}&parent=localhost&autoplay=false`;
+streamUrl = `https://player.twitch.tv/?channel=${stream}&parent=ironmob.live&autoplay=false`;
 }
 
 videoFrame.src = streamUrl;
@@ -569,7 +569,7 @@ twitch_link_button.addEventListener('click', function() {
 const state = generateRandomString(16); // Change 16 to your desired string length
 const encodedScope = encodeScope();
 localStorage.setItem('state',state);
-const url = `https://id.twitch.tv/oauth2/authorize?response_type=token&client_id=nst9a3hi1iioqv1p75ph1cbx9oridg&redirect_uri=http://localhost:8081&scope=${encodedScope}&state=${state}`;
+const url = `https://id.twitch.tv/oauth2/authorize?response_type=token&client_id=nst9a3hi1iioqv1p75ph1cbx9oridg&redirect_uri=https://ironmob.live&scope=${encodedScope}&state=${state}`;
 window.location.href = url;
 });
 
