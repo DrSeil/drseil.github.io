@@ -1,5 +1,5 @@
 // Twitch stuff probably won't work localy, just mock atoken and userid
-var atoken, userId, currPoke, moveUsed;
+var atoken, userId, username, currPoke, moveUsed;
 var countdownDiv = document.getElementById("countdown-div");
 var countdownText = document.getElementById("countdown-text");
 var readyUpButton = document.getElementById("ready-up");
@@ -71,10 +71,10 @@ skipMeButton.addEventListener("click", function () {
     sendMessage("Skip Me");
 });
 function checkChatter(chatter_list) {
-    console.log(userId);
+    console.log(username);
     console.log(chatter_list);
-    console.log(chatter_list.includes(userId));
-    if (chatter_list.includes(userId)) {
+    console.log(chatter_list.includes(username));
+    if (chatter_list.includes(username)) {
         showPokeballGif();
     }
     else {
@@ -164,7 +164,7 @@ function updatePokemon(pokemon) {
         var move = pokemon.moves[i];
         var moveDetails = "Category: ".concat(move.category, ", Power: ").concat(move.power, ", Type: ").concat(move.type, ", Accuracy: ").concat(move.accuracy, ", PP: ").concat(move.pp);
         var buttonColor = '#a5ffa8';
-        var isDisabled = (move.pp <= 0 || pokemon.uid !== userId);
+        var isDisabled = (move.pp <= 0 || pokemon.uid !== username);
         var moveCategory = '';
         if (move.category == 'Physical') {
             moveCategory = '<img src="move-physical.png" alt="Physical" />';
@@ -176,7 +176,7 @@ function updatePokemon(pokemon) {
             moveCategory = '<img src="move-special.png" alt="Special" />';
         }
         // uid is sent to say which twitch user should be allowed to click the buttons.
-        if (pokemon.uid !== userId) {
+        if (pokemon.uid !== username) {
             buttonColor = '#555753';
         }
         else if (move.pp < 5 && move.pp > 0) {
@@ -558,6 +558,7 @@ function processToken(token) {
         .then(function (resp) {
         console.log(resp);
         userId = "U" + resp.data[0].id;
+        username = resp.data[0].display_name;
         socket_space = new initSocket(true);
         // and build schnanaigans
         socket_space.on('connected', function (id) {
@@ -596,7 +597,7 @@ function processToken(token) {
                     var pokemon = text.slice(5); // Remove "pkmn;" and split by ','
                     var decoded_pokemon = (decodePokemon(pokemon));
                     console.log(decoded_pokemon);
-                    if (decoded_pokemon.uid == userId) {
+                    if (decoded_pokemon.uid == username) {
                         updatePokemon(decoded_pokemon);
                         ensureDivVisibility(document.getElementById("moveable"));
                     }
@@ -604,9 +605,9 @@ function processToken(token) {
                 else if (text.startsWith('nts;')) {
                     var trainer = text.slice(4);
                     var trainer_list = trainer.split(",");
-                    var trainer_index = trainer_list.indexOf(userId);
+                    var trainer_index = trainer_list.indexOf(username);
                     console.log(trainer_list);
-                    console.log(userId);
+                    console.log(username);
                     console.log(trainer_index);
                     if (trainer_index > 0) {
                         readyText.textContent = "You are one of the next " + (trainer_list.length) + " trainers";
@@ -628,7 +629,7 @@ function processToken(token) {
                     var trainer = text_split[0];
                     var num_trainers = parseInt(text_split[1]);
                     var msg_countdown = parseInt(text_split[2]);
-                    if (trainer == userId) {
+                    if (trainer == username) {
                         if (countdown > 0) {
                             console.log("Countdown already triggered");
                         }
