@@ -467,12 +467,12 @@ var videoFrame = document.getElementById('twitch-video');
 // Get the URL parameters
 var urlParams = new URLSearchParams(window.location.search);
 // Check if there's a "stream" parameter
-var stream = urlParams.get('stream');
-var streamUrl = "https://player.twitch.tv/?channel=grandpoobear&parent=ironmob.live&autoplay=false";
-if (stream) {
-    streamUrl = "https://player.twitch.tv/?channel=".concat(stream, "&parent=ironmob.live&autoplay=false");
-}
-videoFrame.src = streamUrl;
+// const stream = urlParams.get('stream');
+// let streamUrl = "https://player.twitch.tv/?channel=drseil&parent=ironmob.live&autoplay=false";
+// if (stream) {
+// streamUrl = `https://player.twitch.tv/?channel=${stream}&parent=ironmob.live&autoplay=false`;
+// }
+// videoFrame.src = streamUrl;
 toggleButton.addEventListener('click', function () {
     chatDiv.classList.toggle('hidden'); // Toggles 'hidden' class
 });
