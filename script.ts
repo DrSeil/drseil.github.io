@@ -569,7 +569,8 @@ twitch_link_button.addEventListener('click', function() {
 const state = generateRandomString(16); // Change 16 to your desired string length
 const encodedScope = encodeScope();
 localStorage.setItem('state',state);
-const url = `https://id.twitch.tv/oauth2/authorize?response_type=token&client_id=nst9a3hi1iioqv1p75ph1cbx9oridg&redirect_uri=https://ironmob.live&scope=${encodedScope}&state=${state}`;
+
+const url = `https://id.twitch.tv/oauth2/authorize?response_type=token&client_id=nst9a3hi1iioqv1p75ph1cbx9oridg&redirect_uri=${window.location.href}&scope=${encodedScope}&state=${state}`;
 window.location.href = url;
 });
 
