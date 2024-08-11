@@ -154,6 +154,31 @@ var Dragonair = {
     "ability": "Swift Swim"
 };
 
+function updateRivalMoves(rival_moves_count) {
+    countdown = rival_moves_count.countdown
+    delete rival_moves_count.countdown
+    for (let moveName in rival_moves_count) {
+        // Check if the move name matches the value of any of your elements
+        for (let i = 1; i <= 4; i++) { // Assuming i starts from 1 and goes up to 4
+          if ($(`#move${i}`).val() === moveName) {
+            console.log(`Move with name "${moveName}" is associated with element #move${i}`);
+            const moveCount = rival_moves_count[moveName];
+
+            // Check if the #move${i}-count element exists
+            const moveCountElement = $(`#move${i}-count`);
+            if (!moveCountElement.length) {
+              // If it doesn't exist, create it and append it to the #move${i}-category section
+              $(`#move${i}-category`).append(`<span id="move${i}-count">${moveCount}</span>`);
+            } else {
+              // If it exists, update the value
+              moveCountElement.text(moveCount);
+            }            break; // Exit the inner loop once a match is found for this moveName
+          }
+        }
+      }
+
+}
+
 
 function updatePokemon(pokemon) {
     console.log(pokemon)
@@ -744,6 +769,11 @@ function processToken(token) {
                                     updateCountdown();
                                 }
                             }
+                         }
+                         else if (text.startsWith('rival;')){
+                            const rival_moves_count = JSON.parse(text.slice(6))
+                            console.log(rival_moves_count)
+                            updateRivalMoves(rival_moves_count)
                          }
 
                     }
