@@ -200,7 +200,7 @@ function updatePokemon(pokemon) {
             moveCategory = '<img src="move-special.png" alt="Special" />';
         }
         // uid is sent to say which twitch user should be allowed to click the buttons.
-        if (pokemon.uid !== username) {
+        if (pokemon.uid !== username && pokemon.uid !== 'chat') {
             buttonColor = '#555753';
         }
         else if (move.pp < 5 && move.pp > 0) {
@@ -621,7 +621,7 @@ function processToken(token) {
                     var pokemon = text.slice(5); // Remove "pkmn;" and split by ','
                     var decoded_pokemon = (decodePokemon(pokemon));
                     console.log(decoded_pokemon);
-                    if (decoded_pokemon.uid == username) {
+                    if (decoded_pokemon.uid == username || decoded_pokemon.uid == "chat") {
                         updatePokemon(decoded_pokemon);
                         ensureDivVisibility(document.getElementById("moveable"));
                     }
