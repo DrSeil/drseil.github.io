@@ -596,7 +596,7 @@ function processToken(token) {
             addsimplelog('Session mystery died due to silence detected');
         });
         socket_space.on('session_keepalive', function () {
-            console.log("keepalive");
+            //console.log("keepalive")
         });
         socket_space.on('revocation', function (_a) {
             var payload = _a.payload;
