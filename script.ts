@@ -159,7 +159,7 @@ function updateRivalMoves(rival_moves_count) {
     delete rival_moves_count.countdown
     for (let moveName in rival_moves_count) {
         // Check if the move name matches the value of any of your elements
-        for (let i = 1; i <= 4; i++) { // Assuming i starts from 1 and goes up to 4
+        for (let i = 0; i <= 3; i++) { // Assuming i starts from 1 and goes up to 4
           if ($(`#move${i}`).val() === moveName) {
             console.log(`Move with name "${moveName}" is associated with element #move${i}`);
             const moveCount = rival_moves_count[moveName];
