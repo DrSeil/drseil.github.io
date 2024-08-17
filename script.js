@@ -188,7 +188,7 @@ function updatePokemon(pokemon) {
         var move = pokemon.moves[i];
         var moveDetails = "Category: ".concat(move.category, ", Power: ").concat(move.power, ", Type: ").concat(move.type, ", Accuracy: ").concat(move.accuracy, ", PP: ").concat(move.pp);
         var buttonColor = '#a5ffa8';
-        var isDisabled = (move.pp <= 0 || pokemon.uid !== username);
+        var isDisabled = (move.pp <= 0 || (pokemon.uid !== username && pokemon.uid !== 'chat'));
         var moveCategory = '';
         if (move.category == 'Physical') {
             moveCategory = '<img src="move-physical.png" alt="Physical" />';
