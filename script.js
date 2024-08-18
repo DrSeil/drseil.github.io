@@ -26,14 +26,14 @@ function ensureDivVisibility(divElement, containerElement) {
 function handleWhisper(message) {
     if (message.hasOwnProperty("readyup")) {
         console.log(message);
-        if (countdown > 0) {
+        if (trainer_countdown > 0) {
             console.log("Countdown already triggered");
         }
         else {
             console.log(countdownDiv);
             countdownDiv.style.display = "block";
             trainersCount = message.num_trainers;
-            countdown = message.countdown;
+            trainer_countdown = message.countdown;
             updateCountdown();
         }
     }
@@ -43,12 +43,12 @@ function handleWhisper(message) {
         ensureDivVisibility(document.getElementById("moveable"));
     }
 }
-var countdown = -1; // Initial countdown value
+var trainer_countdown = -1; // Initial countdown value
 var trainersCount = 3; // Initial X value
 function updateCountdown() {
-    if (countdown > 0) {
-        countdownText.textContent = defaultCountdownText.replace(/YY/g, countdown).replace(/X/g, trainersCount);
-        countdown--;
+    if (trainer_countdown > 0) {
+        countdownText.textContent = defaultCountdownText.replace(/YY/g, trainer_countdown).replace(/X/g, trainersCount);
+        trainer_countdown--;
         setTimeout(updateCountdown, 1000);
     }
     else {
@@ -58,7 +58,7 @@ function updateCountdown() {
 }
 function countdownFinished() {
     countdownDiv.style.display = "none"; // Hide the div
-    countdown = -1;
+    trainer_countdown = -1;
     // Perform any other actions needed when countdown is finished
 }
 // Event listeners for buttons
@@ -135,7 +135,7 @@ var Dragonair = {
     "ability": "Swift Swim"
 };
 function updateRivalMoves(rival_moves_count) {
-    countdown = rival_moves_count.countdown;
+    var rival_countdown = rival_moves_count.countdown;
     delete rival_moves_count.countdown;
     for (var moveName in rival_moves_count) {
         // Check if the move name matches the value of any of your elements
@@ -654,14 +654,14 @@ function processToken(token) {
                     var num_trainers = parseInt(text_split[1]);
                     var msg_countdown = parseInt(text_split[2]);
                     if (trainer == username) {
-                        if (countdown > 0) {
+                        if (trainer_countdown > 0) {
                             console.log("Countdown already triggered");
                         }
                         else {
                             console.log(countdownDiv);
                             countdownDiv.style.display = "block";
                             trainersCount = num_trainers;
-                            countdown = msg_countdown;
+                            trainer_countdown = msg_countdown;
                             updateCountdown();
                         }
                     }

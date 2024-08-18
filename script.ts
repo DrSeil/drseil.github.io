@@ -35,13 +35,13 @@ function handleWhisper(message){
     if(message.hasOwnProperty("readyup"))
     {
         console.log(message)
-        if(countdown > 0){
+        if(trainer_countdown > 0){
             console.log("Countdown already triggered")
         }else {
             console.log(countdownDiv)
             countdownDiv.style.display = "block";
             trainersCount = message.num_trainers;
-            countdown = message.countdown;
+            trainer_countdown = message.countdown;
             updateCountdown();
         }
     }
@@ -54,13 +54,13 @@ function handleWhisper(message){
 
 
 
-let countdown = -1; // Initial countdown value
+let trainer_countdown = -1; // Initial countdown value
 let trainersCount = 3; // Initial X value
 
 function updateCountdown() {
-  if (countdown > 0) {
-    countdownText.textContent = defaultCountdownText.replace(/YY/g, countdown).replace(/X/g, trainersCount);
-    countdown--;
+  if (trainer_countdown > 0) {
+    countdownText.textContent = defaultCountdownText.replace(/YY/g, trainer_countdown).replace(/X/g, trainersCount);
+    trainer_countdown--;
     setTimeout(updateCountdown, 1000);
   } else {
     // Call your function here when countdown reaches 0
@@ -70,7 +70,7 @@ function updateCountdown() {
 
 function countdownFinished() {
   countdownDiv.style.display = "none"; // Hide the div
-  countdown = -1;
+  trainer_countdown = -1;
   // Perform any other actions needed when countdown is finished
 }
 
@@ -155,7 +155,7 @@ var Dragonair = {
 };
 
 function updateRivalMoves(rival_moves_count) {
-    countdown = rival_moves_count.countdown
+    var rival_countdown = rival_moves_count.countdown
     delete rival_moves_count.countdown
     for (let moveName in rival_moves_count) {
         // Check if the move name matches the value of any of your elements
@@ -759,13 +759,13 @@ function processToken(token) {
                             const msg_countdown = parseInt(text_split[2])
                             if (trainer == username)
                                 {
-                                if(countdown > 0){
+                                if(trainer_countdown > 0){
                                     console.log("Countdown already triggered")
                                 }else {
                                     console.log(countdownDiv)
                                     countdownDiv.style.display = "block";
                                     trainersCount = num_trainers
-                                    countdown = msg_countdown
+                                    trainer_countdown = msg_countdown
                                     updateCountdown();
                                 }
                             }
