@@ -317,7 +317,8 @@ function useMove(event) {
     //$('.waiting').show();
     let moveName = event.data.move;
     console.log(moveName)
-    if (currPoke.moves.find(x => x.name == moveName).pp <= 0)
+    let move_pp = currPoke.moves.find(x => x.name == moveName).pp 
+    if (move_pp <= 0)
     {
         console.log("you can't do that");
         return;
@@ -341,7 +342,7 @@ function useMove(event) {
 
 
     //console.log(data);
-    sendMessage("selectedMove:"+moveName)
+    sendMessage("selectedMove:"+moveName +":"+Math.random())
 
     let url = 'https://us-west1-ironmob.cloudfunctions.net/ChosenMove';
     let data = { selectedMove: moveName, 

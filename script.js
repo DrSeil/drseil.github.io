@@ -276,7 +276,8 @@ function useMove(event) {
     //$('.waiting').show();
     var moveName = event.data.move;
     console.log(moveName);
-    if (currPoke.moves.find(function (x) { return x.name == moveName; }).pp <= 0) {
+    var move_pp = currPoke.moves.find(function (x) { return x.name == moveName; }).pp;
+    if (move_pp <= 0) {
         console.log("you can't do that");
         return;
     }
@@ -293,7 +294,7 @@ function useMove(event) {
     div.css('borderWidth', '2px');
     div.css('borderColor', 'red');
     //console.log(data);
-    sendMessage("selectedMove:" + moveName);
+    sendMessage("selectedMove:" + moveName + ":" + move_pp);
     var url = 'https://us-west1-ironmob.cloudfunctions.net/ChosenMove';
     var data = { selectedMove: moveName,
         timestamp: new Date().getTime(),
