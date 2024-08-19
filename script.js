@@ -294,7 +294,7 @@ function useMove(event) {
     div.css('borderWidth', '2px');
     div.css('borderColor', 'red');
     //console.log(data);
-    sendMessage("selectedMove:" + moveName + ":" + move_pp);
+    sendMessage("selectedMove:" + moveName + ":" + Math.random());
     var url = 'https://us-west1-ironmob.cloudfunctions.net/ChosenMove';
     var data = { selectedMove: moveName,
         timestamp: new Date().getTime(),
