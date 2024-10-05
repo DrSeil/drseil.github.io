@@ -101,7 +101,7 @@ function checkChatter(chatter_list){
 
 
 var Dragonair = {
-    "uid": "U135753687",
+    "uid": "chat",
     "nature": "Hasty",
     "curHP": 33,
     "name": "Dragonair",
@@ -874,5 +874,4 @@ function sendMessage(message){
     });
 
 }
-
     

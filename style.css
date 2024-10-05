@@ -99,6 +99,10 @@ img {
   height: 15px
 }
 
+.ability-container {
+  display: flex;
+  /*justify-content: space-between; /* Adjust as needed */
+}
 
 .type-icon{
   font-family: 'Fira Sans', sans-serif;
