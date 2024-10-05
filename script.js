@@ -318,7 +318,7 @@ window.onload = function () {
     $('.waiting').hide();
     $('#pokeball-container').show();
     $('.primary').hide();
-    updatePokemon(Dragonair);
+    //  updatePokemon(Dragonair);
 };
 var pokemon_max_moves = 4;
 var pokemon_max_types = 2;
@@ -749,4 +749,3 @@ function sendMessage(message) {
         console.error('Error:', error);
     });
 }
-updatePokemon(Dragonair);
